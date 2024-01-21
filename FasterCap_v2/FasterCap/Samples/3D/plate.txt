@@ -1,0 +1,11 @@
+0 1x1 unit square conducting plate
+*
+* capacitance should be about 0.36679 * 4 * pi * e0 = 40.81 pF
+* see "Use of Triangular Elements for Nearly Exact BEM Solutions", 
+* S. Mukhopadhyay, N. Majumdar, INO Section, Saha Institute of Nuclear Physics
+* and "Development of a BEM Solver using Exact Expressions for Computing
+* the Influence of Singularity Distributions", S.Mukhopadhyay1, N.Majumdar
+* Worst-case upper and lower bounds are 40.73 and 40.83
+*
+Q 1 0.00000e+000 0.00000e+000 0.00000e+000  1.00000e+000 0.00000e+000 0.00000e+000 1.00000e+000 1.00000e+000 0.00000e+000  0.00000e+000 1.00000e+000 0.00000e+000
+

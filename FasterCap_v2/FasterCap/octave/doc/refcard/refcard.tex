@@ -1,0 +1,811 @@
+% refcard.tex
+%
+% This file is TeX source for a reference card describing Octave.
+%
+% Copyright (C) 1996-2023 The Octave Project Developers
+%
+% See the file COPYRIGHT.md in the top-level directory of this
+% distribution or <https://octave.org/copyright/>.
+%
+% This file is part of Octave.
+%
+% Octave is free software: you can redistribute it and/or modify it
+% under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+% Octave is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with Octave; see the file COPYING.  If not, see
+% <https://www.gnu.org/licenses/>.
+%
+%
+% Heavily modified by jwe from the source for the gdb reference card,
+% which was originally written by Roland Pesch <pesch@cygnus.com>.
+%
+%   Copyright (C) 1991, 1992 Free Software Foundation, Inc.
+%   Permission is granted to make and distribute verbatim copies of
+%   this reference provided the copyright notices and permission notices
+%   are preserved on all copies.
+%
+%
+% TeX markup is a programming language; accordingly this file is source
+% for a program to generate a reference.
+%
+% You only have to set the total width and height of the paper, the
+% horizontal and vertical margin space measured from *paper edge*
+% and the interline and interspec spacing.
+% In order to support a new papersize, you have to fiddle with the
+% latter four dimensions.  Just try out a few values.
+% All other values will be computed at process time so it should be
+% quite easy to support different paper sizes - only four values to
+% guess :-)
+%
+% To find the configuration places, just search for the string
+% "User configuration".
+%
+%   -- Andreas Vogel (av@ssw.de)
+%
+% NOTE ON INTENTIONAL OMISSIONS: This reference card includes many
+% Octave commands, but due to space constraints there are some things
+% I chose to omit.  In general, not all synonyms for commands are
+% covered, nor all variations of a command.
+
+\def\octaveversion{8.0.0}
+
+% ------------------
+% multicolumn format
+% ------------------
+
+% Declarations (these must come first)
+
+\newdimen\totalwidth
+\newdimen\totalheight
+\newdimen\hmargin
+\newdimen\vmargin
+\newdimen\secskip
+\newdimen\lskip
+\newdimen\barwidth
+\newdimen\barheight
+\newdimen\intersecwidth
+
+\newcount\columnsperpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                     %
+% CONFIGURATION                                                       %
+%                                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% There are currently 8 total columns, so some of these options will
+% not create a single page reference card.
+
+% Choose a paper size.  Default is US letter size.
+
+\def\refcardafoursize{a4}      % 3 columns, A4 paper (1 in = 254 mm)
+\def\refcardlegalsize{legal}   % 4 columns, US legal paper (8.5 x 14in)
+\def\refcardlettersize{letter} % 3 columns, US letter paper (8.5 x 11in)
+
+\ifx\refcardsize\refcardafoursize
+  \columnsperpage=3     % total number of columns to typeset
+  \totalwidth=297mm     % total width of paper
+  \totalheight=210mm    % total height of paper
+  \hmargin=9mm          % horizontal margin width
+  \vmargin=7mm          % vertical margin width
+  \secskip=3mm          % space between refcard secs
+  \lskip=0.4mm          % extra skip between \sec entries
+\else
+  \ifx\refcardsize\refcardlegalsize
+    \columnsperpage=4   % total number of columns to typeset
+    \totalwidth=14in    % total width of paper
+    \totalheight=8.5in  % total height of paper
+    \hmargin=0.20in     % horizontal margin width
+    \vmargin=0.25in     % vertical margin width
+    \secskip=0.75pc     % space between refcard secs
+    \lskip=2pt          % extra skip between \sec entries
+  \else
+    \columnsperpage=3   % total number of columns to typeset
+    \totalwidth=11in    % total width of paper
+    \totalheight=8.5in  % total height of paper
+    \hmargin=0.25in     % horizontal margin width
+    \vmargin=0.25in     % vertical margin width
+    \secskip=0.75pc     % space between refcard secs
+    \lskip=2pt          % extra skip between \sec entries
+  \fi
+\fi
+
+\ifx\pdfoutput\undefined
+\else
+  \pdfpageheight=\totalheight
+  \pdfpagewidth=\totalwidth
+\fi
+
+% Change according to personal taste, not papersize dependent.
+
+\barwidth=.1pt       % width of the cropmark bar
+\barheight=2pt       % height of the cropmark bar
+\intersecwidth=0.5em % width between \itmwid and \dfnwid
+
+% Uncomment only one of the following definitions for folding guides.
+
+% No printed folding guide:
+
+\def\vdecor{\hskip\hmargin plus1fil
+  \hskip\barwidth plus1fil
+  \hskip\hmargin plus1fil}
+
+% Solid line folding guide:
+
+%\def\vdecor{\hskip\hmargin plus1fil%
+%  \vrule width \barwidth%
+%  \hskip\hmargin plus1fil}
+
+% For small marks near top and bottom as folding guide:
+
+%\def\vdecor{\hskip\hmargin plus1fil%
+%  \vbox to \vsize{\hbox to \barwidth{\vrule height\barheight width\barwidth}%
+%  \vfill
+%  \hbox to \barwidth{\vrule height\barheight width\barwidth}}%
+%  \hskip\hmargin plus1fil}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                      %
+% END CONFIGURATION                                                    %
+%                                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% values to be computed based on above definitions.
+% nothing to configure
+
+\newdimen\fullhsize          % width of area without margins
+\newdimen\itmwid             % width of item column
+\newdimen\dfnwid             % width of definition column
+\newdimen\idnwid             % width of indented text
+\newdimen\temp               % only for temporary use
+
+% an alternate section format, used in some cases to make text fit better.
+
+\newdimen\altitmwid        % width of item column in altsec
+\newdimen\altdfnwid        % width of definition column in altsec
+
+% Subtract hmargin for left and right sides of paper from full width.
+%
+%   fullhsize = totalwidth - (2 * hmargin)
+
+\fullhsize=\totalwidth
+\temp=\hmargin
+\multiply \temp by 2
+\advance \fullhsize by -\temp
+
+% intercolumn space is composed of hmargin barwidth hmargin so that we
+% get the same amount of space on either side of the (optional) rule
+% between columns.  For N columns, we need to subtract this amount of
+% space N-1 times.  Divide by the number of columns to get the final
+% value of \hsize that we use to typeset columns.
+
+% hsize = (fullhsize - (ncols-1)*barwidth - 2*(ncols-1)*hmargin) / ncols
+
+\newcount\tmpcnt
+\tmpcnt\columnsperpage
+\advance \tmpcnt by -1
+
+\hsize=\fullhsize
+
+\temp=\barwidth
+\multiply \temp by \tmpcnt
+\advance \hsize by -\temp
+
+\multiply \tmpcnt by 2
+
+\temp=\hmargin
+\multiply \temp by \tmpcnt
+\advance \hsize by -\temp
+
+\divide \hsize by \columnsperpage
+
+% Vertical size is easy -- same amount of space above and below.
+%
+%   vsize = totalheight - (2 * vmargin)
+
+\vsize=\totalheight
+\temp=\vmargin
+\multiply \temp by 2
+\advance \vsize by -\temp
+
+% adjust the offsets so the margins are measured *from paper edge*
+
+\hoffset=-1in \advance \hoffset by \hmargin
+\voffset=-1in \advance \voffset by \vmargin
+
+% Width of items in a section.
+
+% itmwid = (hsize - intersecwidth) * 1/3
+% dfnwid = (hsize - intersecwidth) * 2/3
+
+% width of the item
+
+\temp=\hsize
+\advance \temp by -\intersecwidth
+\divide \temp by 3
+\itmwid=\temp
+
+% width of the corresponding definition
+
+\dfnwid=\hsize
+\advance \dfnwid by -\itmwid
+
+% indentation for sub items, etc.
+
+\temp=\hsize \advance\temp by -1em
+\idnwid=\temp
+
+% Width of items in an alt section.
+
+\altitmwid=\itmwid \advance \altitmwid by 0.35in
+\altdfnwid=\dfnwid \advance \altdfnwid by -0.35in
+
+% Output macros.
+%
+% Strategy:
+%
+%   * set each column in a box
+%   * append new columns in a global `holding' box, inserting
+%     intercolumn decorations as necessary.
+%   * when we fill a page, dump the saved box and the latest column,
+%     separated by the intercolumn decoration.
+
+\newbox\holdbox
+\newcount\colno
+\colno=0
+
+\output={\relax
+  \global\advance\colno by 1
+  \ifnum\colno=1
+    \global\setbox\holdbox=\columnbox
+  \else
+    \ifnum\colno=\columnsperpage
+      \shipout\hbox to \fullhsize{\box\holdbox\vdecor\columnbox}
+      \advancepageno
+      \global\colno=0
+    \else
+      \global\setbox\holdbox=\vbox{\hbox{\box\holdbox\vdecor\columnbox}}
+    \fi
+  \fi}
+
+\def\columnbox{\leftline{\pagebody}}
+
+\def\bye{\par\vfill
+  \supereject
+  \if R\lcr \null\vfill\eject \fi
+  \end}
+
+% -----
+% Fonts
+% -----
+
+\font\bbf=cmbx10
+\font\vbbf=cmbx12
+\font\smrm=cmr6
+\font\brm=cmr10
+\font\rm=cmr7
+\font\it=cmti7
+\font\tt=cmtt8
+
+% We can afford to allow some slop
+
+\hfuzz=1pt
+\vfuzz=1pt
+\hyphenpenalty=5000
+\tolerance=2000
+\raggedright
+\raggedbottom
+\normalbaselineskip=9pt
+\baselineskip=9pt
+
+\parindent=0pt
+\parskip=0pt
+\footline={\vbox to0pt{\hss}}
+
+\def\ctl#1{{\tt C-#1}}
+\def\opt#1{{\brm[{\rm #1}]}}
+\def\xtra#1{\noalign{\smallskip{\tt#1}}}
+
+% A normal section
+
+\long\def\sec#1;#2\endsec{\vskip \secskip
+  \halign{%
+%
+% column 1 (of halign):
+%
+    \vtop{\hsize=\itmwid\tt ##\par\vskip \lskip }\hfil
+%
+% column 2 (of halign):
+%
+    &\vtop{%
+      \hsize=\dfnwid
+      \hangafter=1
+      \hangindent=\intersecwidth
+      \rm ##\par\vskip \lskip}\cr
+%
+% Tail of \long\def fills in halign body with \sec args:
+%
+    \noalign{{\bbf #1}%
+      \vskip \lskip}
+    #2}}
+
+\long\def\widesec#1;#2\endsec{\vskip \secskip
+  \halign{%
+%
+% column 1 (of halign):
+%
+    \vbox{\tt
+      ##\par\vskip \lskip }\cr
+%
+% Tail of \long\def fills in halign body with \sec args:
+%
+      \noalign{{\bbf #1}\vskip 3\lskip}
+    #2}}
+
+% an alternate section format, used in some cases to make text fit better.
+
+\long\def\altsec#1;#2\endsec{\vskip \secskip
+  \halign{%
+%
+% column 1 (of halign):
+%
+    \vtop{\hsize=\altitmwid\tt
+      ##\par\vskip \lskip}\hfil
+%
+% column 2 (of halign):
+%
+    &\vtop{%
+      \hsize=\altdfnwid
+      \hangafter=1
+      \hangindent=\intersecwidth
+      \rm ##\par\vskip \lskip}\cr
+%
+% Tail of \long\def fills in halign body with \sec args:
+%
+    \noalign{{\bbf #1}\vskip \lskip}
+    #2}}
+
+% -------------------------------------
+% The actual text of the reference card
+% -------------------------------------
+
+{\vbbf Octave Quick Reference}\hfil{\smrm Octave \octaveversion}\qquad
+{\smrm Copyright 1996-2023 The Octave Project Developers}
+
+\altsec Starting and Stopping;
+octave \opt{-\hbox{}-gui}&start Octave CLI/GUI session\cr
+octave {\it file}&run Octave commands in {\it file}\cr
+octave --eval {\it code}&evaluate {\it code} using Octave\cr
+octave --help&describe command line options\cr
+quit {\rm or} exit&exit Octave\cr
+Ctrl-C&terminate current command and return to top-level prompt\cr
+\endsec
+
+\sec Getting Help;
+help {\it command}&briefly describe {\it command}\cr
+doc&use Info to browse Octave manual\cr
+doc {\it command}&search for {\it command} in Octave manual\cr
+lookfor {\it str}&search for {\it command} based on {\it str}\cr
+\endsec
+
+\sec Command Completion and History;
+TAB&complete a command or variable name\cr
+Alt-?&list possible completions\cr
+Ctrl-r Ctrl-s&search command history\cr
+\endsec
+
+\sec Directory and Path Commands;
+cd {\it dir}&change working directory to {\it dir}\cr
+pwd&print working directory\cr
+ls \opt{{\it options}}&print directory listing\cr
+what&list .m/.mat files in the current directory\cr
+path&search path for Octave functions\cr
+pathdef&default search path\cr
+addpath ({\it dir})&add a directory to the path\cr
+getenv ({\it var})&value of environment variable\cr
+\endsec
+
+\altsec Package Management;
+\omit\vbox{\rm\vskip0.25ex
+  Add-on packages are independent of core Octave, listed at
+  {https://packages.octave.org/} \vskip0.75ex}\span\cr
+pkg install -forge {\it pkg}&download and install {\it pkg}\cr
+pkg install {\it file.tar.gz}&install pre-downloaded package file\cr
+pkg list&show installed packages\cr
+pkg load / pkg unload&load/unload installed package\cr
+statistics optimization control signal image symbolic etc.&various common
+packages\cr
+\endsec
+
+\sec Matrices;
+\omit\vbox{\rm\vskip0.25ex
+  Square brackets delimit literal matrices.  Commas separate elements
+  on the same row.  Semicolons separate rows.  Commas may be replaced
+  by spaces, and semicolons may be replaced by newlines.
+  Elements of a matrix may be arbitrary expressions, assuming
+  all the dimensions agree.\vskip0.75ex}\span\cr
+[ {\it x}, {\it y}, ... ]&enter a row vector\cr
+[ {\it x}; {\it y}; ... ]&enter a column vector\cr
+[ {\it w}, {\it x}; {\it y}, {\it z} ]&enter a 2$\times$2 matrix\cr
+rows columns&number of rows/columns of matrix\cr
+zeros ones&create matrix of zeros/ones\cr
+eye diag&create identity/diagonal matrix\cr
+rand randi randn&create matrix of random values\cr
+sparse spalloc&create a sparse matrix\cr
+all&true if all elements nonzero\cr
+any&true if at least one element nonzero\cr
+nnz&number of nonzero elements\cr
+\endsec
+
+\sec Multi-dimensional Arrays;
+ndims&number of dimensions\cr
+reshape squeeze&change array shape\cr
+resize&change array shape, lossy\cr
+cat&join arrays along a given dimension\cr
+permute ipermute shiftdim&like N-dimensional transpose\cr
+circshift&cyclically shift array elements\cr
+meshgrid&matrices useful for vectorization\cr
+\endsec
+
+\sec Ranges;
+\omit\vbox{\rm\vskip0.25ex
+  Create sequences of real numbers as row vectors.\vskip0.75ex}\span\cr
+{\it base} : {\it limit}\cr
+{\it base} : {\it incr} : {\it limit}\cr
+\omit\hfill\vbox{\hsize=\idnwid\rm\vskip0.75ex
+  {\it incr} == 1 if not specified.  Negative ranges allowed.}\span\cr
+\endsec
+
+\altsec Numeric Types and Values;
+\omit\vbox{\rm\vskip0.5ex
+  Integers saturate in Octave.  They do not roll over.
+  \vskip0.75ex}\span\cr
+int8 int16 int32 int64&signed integers\cr
+uint8 uint16 uint32 uint64&unsigned integers\cr
+single double&32-bit/64-bit IEEE floating point\cr
+intmin intmax flintmax&integer limits of given type\cr
+realmin realmax&floating point limits of given type\cr
+inf nan NA&IEEE infinity, NaN, missing value\cr
+eps&machine precision\cr
+pi e&3.14159..., 2.71828...\cr
+i j&$\sqrt{-1}$\cr
+\endsec
+
+\sec Strings;
+\omit\vbox{\rm\vskip0.5ex
+  A {\it string constant\/} consists of a sequence of characters
+  enclosed in either double-quote or single-quote marks.  Strings
+  in double-quotes allow the use of the escape sequences below.
+  \vskip0.75ex}\span\cr
+\char'134\char'134&a literal backslash\cr
+\char'134 "&a literal double-quote character\cr
+\char'134 '&a literal single-quote character\cr
+\char'134 n&newline, ASCII code 10\cr
+\char'134 t&horizontal tab, ASCII code 9\cr
+sprintf sscanf&formatted IO to/from string\cr
+strcmp&compare strings\cr
+strcat&join strings\cr
+strfind regexp&find matching patterns\cr
+strrep regexprep&find and replace patterns\cr
+\endsec
+
+\sec Index Expressions;
+{\it var}({\it idx})&select elements of a vector\cr
+{\it var}({\it idx1}, {\it idx2})&select elements of a matrix\cr
+{\it var}({[1 3], :})&rows 1 and 3\cr
+{\it var}({:, [2 end]})&the second and last columns\cr
+{\it var}({1:2:end, 2:2:end})&get odd rows and even columns\cr
+{\it var1}({\it var2} == 0)&elements of {\it var1} corresponding to zero
+elements of {\it var2}\cr
+{\it var}({:})&all elements as a column vector\cr
+\endsec
+
+\sec Cells, Structures, and Classdefs;
+{\it{var}}$\{${\it{idx}}$\}$ = ...&set an element of a cell array\cr
+cellfun ({\it f}, {\it c})&apply a function to elements of cell array\cr
+{\it{var}}.{\it{field}} = ...&set a field of a structure\cr
+fieldnames ({\it s})&returns the fields of a structure\cr
+structfun ({\it f}, {\it s})&apply a function to fields of structure\cr
+classdef&define new classes for OOP\cr
+\endsec
+
+\sec Assignment Expressions;
+{\it var} = {\it expr}&assign value to variable\cr
+{\it var}({\it idx}) = {\it expr}&only the indexed elements are changed\cr
+{\it var}({\it idx}) = []&delete the indexed elements\cr
+\endsec
+
+\sec Arithmetic Operators;
+%
+% FIXME These operators look ugly, but putting them in math mode causes
+% some of them to break even more.
+%
+\omit \vbox{\rm\vskip0.75ex
+  If two operands are of different sizes, scalars and singleton dimensions are
+  automatically expanded.  Non-singleton dimensions need to match.
+  \vskip0.75ex}\span\cr
+{\it x} + {\it y}, {\it x} - {\it y}&addition, subtraction\cr
+{\it x} * {\it y}&matrix multiplication\cr
+{\it x} .* {\it y}&element-by-element multiplication\cr
+{\it x} / {\it y}&right division, conceptually equivalent to
+  {\tt (inverse~(y')~*~x')'}\cr
+{\it x} ./ {\it y}&element-by-element right division\cr
+{\it x} \char'134{} {\it y}&left division, conceptually equivalent to
+  {\tt inverse~(x)~*~y}\cr
+{\it x} .\char'134{} {\it y}&element-by-element left division\cr
+{\it x} \char'136{} {\it y}&power operator\cr
+{\it x} .\char'136{} {\it y}&element-by-element power operator\cr
++= -= *= .*= /= ./= \char'134{}= .\char'134{}= \char'136{}= .\char'136{}=&
+in-place equivalents of the above operators\cr
+-{\it x}&negation\cr
++{\it x}&unary plus (a no-op)\cr
+{\it x}$'$&complex conjugate transpose\cr
+{\it x}.$'$&transpose\cr
+++{\it x} --{\it x}&increment / decrement, return {\it new\/} value\cr
+{\it x}++ {\it x}--&increment / decrement, return {\it old\/} value\cr
+\endsec
+
+\sec Comparison and Boolean Operators;
+\omit \vbox{\rm\vskip0.75ex
+  These operators work on an element-by-element basis.  Both arguments
+  are always evaluated.\vskip0.75ex}\span\cr
+< <= == >= >&relational operators\cr
+!= \char'176 =&not equal to\cr
+\& &logical AND\cr
+|  &logical OR\cr
+! \char'176 &logical NOT\cr
+\endsec
+
+\sec Short-circuit Boolean Operators;
+\omit \vbox{\rm\vskip0.75ex
+  Operators evaluate left-to-right.  Operands are only evaluated if
+  necessary, stopping once overall truth value can be determined.
+  Non-scalar operands are converted to scalars with
+  {\tt all}.\vskip0.75ex}\span\cr
+{\it x} \&\& {\it y}&logical AND\cr
+{\it x} || {\it y}&logical OR\cr
+\endsec
+
+\vfill\eject
+
+\sec Operator Precedence;
+\omit \vbox{\rm\vskip0.5ex
+  Table of Octave operators, in order of {\tt decreasing}
+  precedence.\vskip0.75ex}\span\cr
+() $\{\}$ . & array index, cell index, structure index\cr
+'\ \ .'\ \ \char'136\ \ .\char'136&transpose and exponentiation\cr
++\ \ -\ \ ++\ \ --\ \ !&unary minus, increment, logical ``not''\cr
+* / \char'134\ \ .*\ \ ./\ \ .\char'134&multiplication and division\cr
++\ \ -&addition and subtraction\cr
+:&colon\cr
+< <= == >= > !=&relational operators\cr
+\&\ \ |&element-wise ``and'' and ``or''\cr
+\&\&\ \ ||&logical ``and'' and ``or''\cr
+= += -= *= /=  etc.&assignment, groups left to right\cr
+;\ \ ,&statement separators\cr
+\endsec
+
+\altsec General programming;
+\omit \vbox{\rm\vskip0.5ex
+  endfor, endwhile, endif etc. can all be replaced by end.
+  \vskip0.75ex}\span\cr
+for x = 1:10
+
+endfor & for loop\cr
+\cr
+
+while (x <= 10)
+
+endwhile & while loop\cr
+\cr
+
+do
+
+until (x > 10) & do-until loop\cr
+\cr
+
+if (x < 5)
+
+elseif (x < 6)
+
+else
+
+endif & if-then-else\cr
+\cr
+
+switch (tf)
+
+case "true"
+
+case "false"
+
+otherwise
+
+endswitch & switch-case\cr
+\cr
+
+break & exit innermost loop\cr
+\cr
+
+continue & go to start of innermost loop\cr
+\cr
+
+return & jump back from function to caller\cr
+\cr
+
+try
+
+catch & cleanup only on exception\cr
+\cr
+
+unwind\char'137 protect
+
+unwind\char'137 protect\char'137 cleanup& cleanup always \cr
+\endsec
+
+\widesec Functions;
+function \opt{{\it ret-list} =} {\it function-name}
+  \opt{\hskip0.2em({\it arg-list})\hskip0.2em}\cr
+\quad{\it function-body}\cr
+endfunction\cr\cr
+{\rm {\it ret-list\/} may be a single identifier or a comma-separated
+  list of identifiers enclosed by square brackets.\vskip0.75ex}\cr
+{\rm {\it arg-list\/} is a comma-separated list of identifiers and may
+  be empty.}\cr
+\endsec
+
+\sec Function Handles and Evaluation;
+@{\it{func}}&create a function handle to {\it func}\cr
+@({\it vars}) {\it expr}&define an anonymous function\cr
+str2func func2str&convert function to/from string\cr
+functions ({\it handle})&Return information about a function handle\cr
+{\it f} ({\it args})&Evaluate a function handle {\it f}\cr
+feval &Evaluate a function handle or string\cr
+eval ({\it str})&evaluate {\it str} as a command\cr
+system ({\it cmd})&execute arbitrary shell command string\cr
+&\cr
+\omit\vbox{\rm\vskip0.25ex
+  Anonymous function handles make a copy of the variables in the
+  current workspace at the time of creation.\vskip0.75ex}\span\cr
+\endsec
+
+\altsec Global and Persistent Variables;
+global {\it var} = ...&declare \& initialize global variable\cr
+persistent {\it var} = ...&persistent/static variable\cr
+\omit\hfill\vbox{\rm\vskip0.25ex
+  Global variables may be accessed inside the body of a function
+  without having to be passed in the function parameter list provided
+  that they are declared global when used.}\span\cr
+\endsec
+
+\sec Common Functions;
+disp&display value of variable\cr
+printf&formatted output to {\tt stdout}\cr
+input scanf&input from {\tt stdin}\cr
+who whos&list current variables\cr
+clear {\it pattern}&clear variables matching pattern\cr
+exist&check existence of identifier\cr
+find&return indices of nonzero elements\cr
+sort&return a sorted array\cr
+unique&discard duplicate elements\cr
+sortrows&sort whole rows in numerical or lexicographic order\cr
+sum prod&sum or product\cr
+mod rem&remainder functions\cr
+min max range mean median std&basic statistics\cr
+\endsec
+
+\sec Error Handling, Debugging, Profiling;
+error ({\it message})&print message and return to top level\cr
+warning ({\it message})&print a warning message\cr
+debug&guide to all debugging commands\cr
+profile&start/stop/clear/resume profiling\cr
+profshow profexplore&show the results of profiling\cr
+\endsec
+
+\sec File I/O, Loading, Saving;
+save load &save/load variables to/from file\cr
+save -binary &save in binary format (faster)\cr
+dlmread dlmwrite&read/write delimited data\cr
+csvread csvwrite&read/write CSV files\cr
+xlsread xlswrite&read/write XLS spreadsheets\cr
+&\cr
+fopen fclose & open/close files\cr
+fprintf fscanf textscan&formatted file I/O\cr
+fflush&flush pending output\cr
+\endsec
+
+\sec Math Functions;
+\omit \vbox{\rm\vskip0.5ex
+  Run {\tt doc <function>} to find related functions.
+  \vskip0.75ex}\span\cr
+cov corrcoef&covariance, correlation coefficient\cr
+tan tanh atan2&trig and hyperbolic functions\cr
+cross curl del2&vector algebra functions\cr
+&\cr
+det inv& determinant matrix inverse\cr
+eig &eigenvalues and eigenvectors\cr
+norm &vector norm, matrix norm\cr
+rank &matrix rank\cr
+qr &QR factorization\cr
+chol &Cholesky factorization\cr
+svd &singular value decomposition\cr
+&\cr
+fsolve&solve nonlinear algebraic equations\cr
+lsode ode45&integrate nonlinear ODEs\cr
+dassl&integrate nonlinear DAEs\cr
+integral&integrate nonlinear functions\cr
+&\cr
+union&set union\cr
+intersection&set intersection\cr
+setdiff&set difference\cr
+&\cr
+roots &polynomial roots\cr
+poly &matrix characteristic polynomial\cr
+polyder polyint&polynomial derivative or integral\cr
+polyfit polyval&polynomial fitting and evaluation\cr
+residue &partial fraction expansion\cr
+legendre bessel&special functions\cr
+&\cr
+conv conv2& convolution, polynomial multiplication\cr
+deconv& deconvolution, polynomial division\cr
+&\cr
+fft fft2 ifft({\it a})&FFT / inverse FFT\cr
+freqz &FIR filter frequency response\cr
+filter &filter by transfer function\cr
+\endsec
+
+\altsec Plotting and Graphics;
+plot plot3 &2D / 3D plot with linear axes\cr
+line &2D or 3D line\cr
+patch fill&2D patch, optionally colored\cr
+semilogx semilogy loglog&logarithmic axes\cr
+bar hist&bar chart, histogram\cr
+stairs stem&stairsteps and stem graphs\cr
+contour &contour plot\cr
+mesh trimesh surf &plot 3D surfaces\cr
+&\cr
+figure&new figure\cr
+hold on&add to existing figure\cr
+title &set plot title\cr
+axis &set axis range and aspect\cr
+xlabel ylabel zlabel &set axis labels\cr
+text &add text to a plot\cr
+grid legend &draw grid or legend\cr
+&\cr
+image imagesc spy&display matrix as image\cr
+imwrite saveas print&save figure or image\cr
+imread&load an image\cr
+colormap &get or set colormap\cr
+\endsec
+
+\vskip 0pt plus 2fill
+\hrule width \hsize
+\par\vskip10pt
+{\smrm\parskip=6pt
+Quick reference for Octave \octaveversion.
+Copyright 1996-2023 The Octave Project Developers.  The authors assume
+no responsibility for any errors on this card.  This card may be freely
+distributed under the terms of the GNU General Public License.
+
+Octave license and copyright: https://octave.org/copyright/
+
+\TeX{} Macros for this card by Roland Pesch (pesch@cygnus.com),
+originally for the GDB reference card
+}
+
+\end
+
+% For AUCTeX:
+%
+% Local Variables:
+% mode: tex
+% TeX-master: t
+% End:

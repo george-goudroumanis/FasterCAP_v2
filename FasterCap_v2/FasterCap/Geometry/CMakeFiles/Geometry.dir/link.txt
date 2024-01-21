@@ -1,0 +1,2 @@
+/usr/bin/ar qc libGeometry.a CMakeFiles/Geometry.dir/Geometry2D.cpp.o CMakeFiles/Geometry.dir/Triangulate.cpp.o
+/usr/bin/ranlib libGeometry.a

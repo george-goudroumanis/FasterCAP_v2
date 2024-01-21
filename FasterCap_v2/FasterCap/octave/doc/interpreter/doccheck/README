@@ -1,0 +1,107 @@
+################################################################################
+                                   README
+                             doccheck directory
+################################################################################
+This directory contains scripts and data for validating Octave's Texinfo
+documentation.  These scripts are internal developer tools for ensuring
+consistent documentation formats and avoiding misspellings.
+
+The scripts provide 3 services:
+
+1) A spellchecker, built atop GNU aspell with a private dictionary of keywords
+   specific to Octave.
+
+2) A grammarchecker designed from scratch in Perl to ensure a common format
+   for Octave documentation and to make use of as many features of Texinfo as
+   possible.
+
+3) A list of undocumented functions, i.e, those missing an @DOCSTRING reference
+   in the .txi files.
+
+################################################################################
+                                   FILES
+################################################################################
+spellcheck : script to spellcheck a single .texi file.
+aspell.conf: Octave-specific configuration file for Aspell.
+aspell-octave.en.pws : private dictionary of Octave keywords for Aspell.
+add_to_aspell_dict : script to add new words to the private Octave dictionary.
+
+grammarcheck : Perl script to check Octave Texinfo documentation in a single
+               m-file(.m), C++ file(.cc), or Texinfo file(.txi, .texi).
+
+mk_undocumented_list : Perl script to make undocumented function list
+
+################################################################################
+                                   USAGE
+################################################################################
+
+SPELLING:
+
+From the top-level <OCTAVE_DIR>, type 'make spellcheck'.
+If there are any misspellings in <filename>.texi they will be listed in the
+file doc/interpreter/<filename>.scheck
+
+To spellcheck a single file, type 'make doc/interpreter/<filename>.scheck'
+where the file to check is <filename>.texi (for example, "tips.texi").
+
++Sample Flow
+
+make doc/interpreter/arith.scheck
+vi doc/interpreter/arith.scheck
+vi doc/interpreter/arith.texi
+....
+  Review misspellings and identify where to correct the source (.m, .cc, .txi)
+  The original source file is marked with a comment:
+
+  @c FUNCTION_NAME SRC_DIR/SRC_FILE
+
+  When there is no source file comment, the source file is the .txi source.
+  Make corrections to the source files, *not* arith.texi which is derived.
+
+  There are generally three choices for resolving a reported misspelling:
+
+    1. The word is misspelled and should be corrected in the source.
+    2. The word should not be checked for spelling (for example, it might be
+       a proper name such as "Lanczos").  Use the @nospell{...} macro around
+       the word in the source (See Special Cases below).
+    3. The word is valid, but Octave-specific (for example, a function name
+       such as "datenum").  These words should be added to Octave's exception
+       dictionary (see Special Cases below).
+....
+make       # propagate changes to arith.texi
+  repeat spellcheck until the words that remain are not misspellings.
+
++Special Cases
+
+Words which are misspellings, but which can't be changed in the original
+source, should be marked with the @nospell{WORD} macro.  This will cause aspell
+to ignore this particular instance of the word.
+
+For example, in linalg.texi there is a citation of a paper from the
+Manchester Centre for Computational Mathematics.  The proper spelling of Centre
+in the en_US locale is Center.  This word is not an Octave-specific exception
+which can be added to the private dictionary.  Instead the source is marked up:
+Manchester @nospell{Centre} for Computational Mathematics.
+
+aspell will no longer report any misspellings for linalg.texi.
+
+Any words remaining after all misspellings have been corrected are
+Octave-specific spellings and should be added to the Octave private dictionary.
+The script invocation to add words to the dictionary is:
+
+doccheck/add_to_aspell_dict file_of_misspellings
+
+
+GRAMMAR:
+
+To be added
+
+UNDOCUMENTED FUNCTIONS:
+
+From the top-level <OCTAVE_DIR>, type 'make doc/interpreter/undocumented_list'.
+This will produce the file "undocumented_list" with any undocumented functions.
+
+Functions which don't require an @DOCSTRING reference can be added to the list
+of exceptions at the bottom of the mk_undocumented_list script.  This is often
+necessary where a single DOCSTRING, such as besselj, is used to document
+multiple functions.

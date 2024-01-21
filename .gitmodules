@@ -1,0 +1,9 @@
+[submodule "FasterCap_Original_version/FasterCap"]
+	path = FasterCap_Original_version/FasterCap
+	url = https://github.com/ediloren/FasterCap.git
+[submodule "FasterCap_Original_version/Geometry"]
+	path = FasterCap_Original_version/Geometry
+	url = https://github.com/ediloren/Geometry.git
+[submodule "FasterCap_Original_version/LinAlgebra"]
+	path = FasterCap_Original_version/LinAlgebra
+	url = https://github.com/ediloren/LinAlgebra.git
