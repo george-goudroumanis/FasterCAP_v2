@@ -1,6 +1,6 @@
 # FasterCap Version 2
 
-## Description 
+## Description
 
 FasterCap V2 is a powerful three- and two-dimensional capactiance extraction program originated from http://www.fastfieldsolvers.com/. This repository contains an optimized version of the tool achieving 5 times better execution time while producing the same QoRs with the original version.
 
@@ -76,6 +76,101 @@ Then you can launch the build process with:
   
 Remark: at run time you will see the an "Assert failure" message. This is a wxWidgets issue, see ["debug message when running without session manager"](http://trac.wxwidgets.org/ticket/16024). The assert is harmless, and it is fixed starting from wxWidgets 3.1.1
 
+## wxWidgets Installation and Linking with FasterCap 
+
+
+### Step 1: Install wxWidgets
+
+#### Download wxWidgets
+wxWidgets can be downloaded from:
+- their [GitHub repository](https://github.com/wxWidgets/wxWidgets)
+    - [version 3.2](https://github.com/wxWidgets/wxWidgets/tree/3.2)
+- their [website](https://www.wxwidgets.org/downloads/ )
+
+
+#### Prepare wxWidgets
+1. After downloading the wxWidgets package, navigate to the wxWidgets directory and create a build directory. Change into the wxWidgets directory and create a new directory named `buildgtk` for the build files:
+    ```sh
+    cd wxWidgets
+    mkdir buildgtk
+    cd buildgtk
+    ```
+
+2. Configure the build for GTK:
+    - Run the configure script with the `--with-gtk` option to set up the build environment for GTK.
+    ```sh
+    ../configure --with-gtk
+    ```
+    - Optionally, you can set the version of GTK:
+    ```sh
+    ../configure --with-gtk=2
+    ```
+
+3. Update Git submodules if you encounter any errors:
+    - If you run into any errors during the configuration, update the necessary submodules. This ensures that all required third-party libraries are included.
+    ```sh
+    git submodule update --init src/jpeg
+    git submodule update --init src/tiff
+    git submodule update --init src/stc/scintilla
+    git submodule update --init src/stc/lexilla
+    git submodule update --init 3rdparty/catch
+    git submodule update --init 3rdparty/pcre
+    git submodule update --init 3rdparty/nanosvg
+    ```
+
+4. Compile and install wxWidgets:
+    - Compile the wxWidgets source code and install it. Then clean up the build files and update the shared library cache.
+    ```sh
+    make
+    sudo make install
+    make clean
+    sudo ldconfig
+    ```
+
+5. Verify the wxWidgets installation:
+    - Check that wxWidgets is installed correctly by verifying the version.
+    ```sh
+    wx-config --version
+    ```
+
+### Step 2: Link FasterCap with wxWidgets
+
+There are two ways to link FasterCap with wxWidgets, depending on the operating system of your computer.
+
+#### Method 1: Using CMakeFiles 
+*These steps are necessary <ins>only</ins> if `sudo make install` was not possible or if the library path is <ins>not set to the default path</ins>.*
+
+1. Insert the following line into the file `/FasterCap/CMakeFiles/FasterCap.dir/link.txt`:
+    ```sh
+    -L/<wxWidgets_installation_path>/wxWidgets/lib -pthread -lwx_gtk2u_xrc-3.2
+    ```
+    Replace `<wxWidgets_installation_path>` with the path where you have installed the wxWidgets library.
+
+2. **Optional**: Depending on your installed packages, you may need to add the following include directive to the file `/FasterCap/FasterCapConsole.h`:
+    ```cpp
+    #include <omp.h>
+    ```
+    If you encounter issues related to OpenMP, this step may resolve them.
+
+3. Set the following environment variables:
+    ```sh
+    export LD_LIBRARY_PATH=<wxWidgets_installation_path>/wxWidgets/lib
+
+    export LIBRARY_PATH=<wxWidgets_installation_path>/wxWidgets/lib
+
+    export CPATH=<wxWidgets_installation_path>/wxWidgets/include/<wxWidgets_installed_version>
+    ```
+
+    Replace `<wxWidgets_installation_path>` with the path where you have installed the wxWidgets library and `<wxWidgets_installed_version>` with the version of wxWidgets you have installed (in our case this is equal to wx-3.2).
+
+#### Method 2: Modifying CMakeLists.txt 
+1. Replace with your wxWidgets version in file `CMakeLists.txt` of FasterCap:
+    ```cmake
+    set(wxWidgets_CONFIG_OPTIONS --version=<wxWidgets_installed_version> --static=no $<$<CONFIG:Debug>:--debug>)
+    ```
+    This method may be necessary on certain systems where the default linking method does not work properly. Replace `<wxWidgets_installed_version>` with the version of wxWidgets you have installed.
+
+
 ## Additional packages
 
 FasterCap V2 also requires two additional source code packages, that are available through the same official repositories you can access from http://www.fastfieldsolvers.com/ or directly from GitHub.
@@ -86,5 +181,6 @@ The packages are:
 - Geometry
 
 Both package directories, with the above names, must be at the same hierarchy level in the folder structure of the FasterCap source code directory, and are handled by CMake.
+
 
 
